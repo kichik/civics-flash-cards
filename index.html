@@ -51,6 +51,10 @@
     <button onclick="previousQuestion()" class="btn btn-light">&#x23EE;&#xFE0F; Previous Question</button>
     <button onclick="nextQuestion()" class="btn btn-light">&#x23ED;&#xFE0F; Next Question</button>
     <button onclick="shuffleQuestions()" class="btn btn-warning">&#x1F500; Shuffle Questions</button>
+    <select onchange="setLanguage(this.value)" class="form-select" aria-label="Language">
+      <option selected value="english">English</option>
+      <option value="spanish">Spanish</option>
+    </select>
   </div>
   <div id="pdfContainer">
     <canvas id="pdfCanvas"></canvas>
@@ -63,7 +67,6 @@
   <script>
     // PDF file URL
     // const pdfFile = 'https://www.uscis.gov/sites/default/files/document/flash-cards/M-623_red_slides.pdf';
-    const pdfFile = 'M-623_red_slides.pdf';
 
     // Initialize variables
     let pdfDoc = null;
@@ -72,10 +75,28 @@
     let currentQuestion = 0;
 
     // Initialize PDF.js
-    pdfjsLib.getDocument(pdfFile).promise.then(function (doc) {
-      pdfDoc = doc;
-      renderPage(questionPages[currentQuestion]);
-    });
+    function setLanguage(language) {
+      // Destroy the current PDF document
+      if (pdfDoc) {
+        pdfDoc.destroy();
+        pdfDoc = null;
+      }
+
+      // Set the PDF file based on the language
+      let pdfFile = 'M-623_red_slides.pdf';
+      if (language === 'spanish') {
+        pdfFile = 'M-623-S_red_slides.pdf';
+      }
+      
+      // Load the PDF document
+      pdfjsLib.getDocument(pdfFile).promise.then(function (doc) {
+        pdfDoc = doc;
+        renderPage(questionPages[currentQuestion]);
+      });
+    }
+
+    // Set the default language
+    setLanguage('english');
 
     // Render a specific page of the PDF
     function renderPage(pageNumber) {
